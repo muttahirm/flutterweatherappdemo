@@ -12,6 +12,7 @@ dependencies:
   equatable:
   flutter_bloc:
   http:
+  weather_icons:
 
 dev_dependencies:
   flutter_test:
