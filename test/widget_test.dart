@@ -16,27 +16,19 @@ void main() {
     mockFetchWeatherUseCase = MockFetchWeatherUseCase();
   });
 
-  // Widget createWidgetUnderTest() {
-  //   return MaterialApp(
-  //     home: BlocProvider(
-  //       create: (context) => WeatherCubit(mockFetchWeatherUseCase),
-  //       child: const WeatherScreen(),
-  //     ),
-  //   );
-  // }
+  Widget createWidgetUnderTest() {
+    return MaterialApp(
+      home: BlocProvider(
+        create: (context) => WeatherCubit(mockFetchWeatherUseCase),
+        child: const WeatherScreen(),
+      ),
+    );
+  }
 
   testWidgets('finds a single widget widgets', (WidgetTester tester) async {
-    // Create a mock WeatherCubit
-    final mockWeatherCubit = WeatherCubit(mockFetchWeatherUseCase);
-
     // Provide the mock cubit to the widget tree
     await tester.pumpWidget(
-      MaterialApp(
-        home: BlocProvider<WeatherCubit>(
-          create: (_) => mockWeatherCubit,
-          child: const WeatherScreen(),
-        ),
-      ),
+      createWidgetUnderTest(),
     );
 
     // Look for the multiple single widgets widget
