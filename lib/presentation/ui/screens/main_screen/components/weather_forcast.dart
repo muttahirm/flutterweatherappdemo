@@ -34,10 +34,8 @@ class WeatherForcast extends StatelessWidget {
                       .weekday),
                   index: index,
                   iconId: forecastList![index].weather[0].icon,
-                  minimumTemparature: forecastList![index].main.tempMin ??
-                      forecastList![index].main.temp,
-                  maximumTemparature: forecastList![index].main.tempMax ??
-                      forecastList![index].main.temp,
+                  minimumTemparature: forecastList![index].main.tempMin!,
+                  maximumTemparature: forecastList![index].main.tempMax!,
                 ),
           ],
         ),

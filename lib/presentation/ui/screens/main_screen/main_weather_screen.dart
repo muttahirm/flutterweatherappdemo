@@ -46,26 +46,24 @@ class WeatherScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                Expanded(
-                  child: SizedBox(
-                    child: RefreshIndicator(
-                      onRefresh: refreshData,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            if (state.status == WeatherStatus.init) ...[
-                              const SizedBox.shrink(),
-                            ],
-                            if (state.status == WeatherStatus.loading) ...[
-                              const VerticalSpace(spaceLength: 24),
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ],
-                            if (state.status == WeatherStatus.loaded) ...[
+                if (state.status == WeatherStatus.init) const SizedBox.shrink(),
+                if (state.status == WeatherStatus.loading)
+                  const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                if (state.status == WeatherStatus.loaded) ...[
+                  Expanded(
+                    child: SizedBox(
+                      child: RefreshIndicator(
+                        onRefresh: refreshData,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
                               const VerticalSpace(spaceLength: 48.0),
                               DayHeader(
                                 day: state.weekDay,
@@ -104,28 +102,29 @@ class WeatherScreen extends StatelessWidget {
                                 forecastList: state.forcastList,
                               ),
                             ],
-                            if (state.status == WeatherStatus.refreshing) ...[
-                              const VerticalSpace(spaceLength: 24.0),
-                              const CircularProgressIndicator(),
-                            ],
-                            if (state.status == WeatherStatus.error) ...[
-                              Center(
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      context
-                                          .read<WeatherCubit>()
-                                          .fetchWeather('Berlin');
-                                      controller.text = 'Berlin';
-                                    },
-                                    child: const Text('Press to restart')),
-                              )
-                            ]
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                ],
+                if (state.status == WeatherStatus.refreshing)
+                  const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                if (state.status == WeatherStatus.error)
+                  Expanded(
+                    child: Center(
+                      child: ElevatedButton(
+                          onPressed: () {
+                            context.read<WeatherCubit>().fetchWeather('Berlin');
+                            controller.text = 'Berlin';
+                          },
+                          child: const Text('Press to restart')),
+                    ),
+                  ),
               ],
             ),
           );
