@@ -1,217 +1,140 @@
 import 'package:flutter/material.dart';
-import 'package:flutterweatherappdemo/core/constants/weather_icons.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterweatherappdemo/presentation/bloc/cubit/weather_cubit.dart';
 import 'package:flutterweatherappdemo/presentation/ui/shared_widgets/spaces/spaces.dart';
+
+import 'components/components.dart';
+import 'components/weather_forcast.dart';
 
 class WeatherScreen extends StatelessWidget {
   const WeatherScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 18.0, vertical: 48.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              DayHeader(
-                day: "Friday",
-              ),
-              VerticalSpace(spaceLength: 24),
-              WeatherCondition(
-                condition: "Showers",
-              ),
-              VerticalSpace(spaceLength: 24),
-              // weatherIcon(screenWidth, ),
-              WeatherIcon(
-                iconId: "03d",
-              ),
-              VerticalSpace(spaceLength: 48.0),
-              Temparature(
-                temparature: 20,
-              ),
-              VerticalSpace(spaceLength: 24.0),
-              OtherMeasures(
-                measurementName: "Humidity",
-                amount: 67,
-                symbol: "%",
-              ),
-              Divider(),
-              OtherMeasures(
-                measurementName: "Pressure",
-                amount: 1009,
-                symbol: "hPa",
-              ),
-              Divider(),
-              OtherMeasures(
-                measurementName: "Wind",
-                amount: 23,
-                symbol: "km/h",
-              ),
-              VerticalSpace(spaceLength: 24.0),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+    TextEditingController controller = TextEditingController();
 
-class OtherMeasures extends StatelessWidget {
-  final String measurementName;
-  final int amount;
-  final String symbol;
-  const OtherMeasures({
-    required this.measurementName,
-    required this.amount,
-    required this.symbol,
-    super.key,
-  });
+    Future<void> refreshData() async {
+      context.read<WeatherCubit>().refreshWeather();
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          measurementName,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        Text(
-          "$amount $symbol",
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class WeatherIcon extends StatelessWidget {
-  final String iconId;
-  const WeatherIcon({
-    required this.iconId,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Center(
-      child: Icon(
-        getWeatherIconData(iconId),
-        size: screenWidth * 0.5,
-      ),
-    );
-  }
-}
-
-class WeatherCondition extends StatelessWidget {
-  final String condition;
-  const WeatherCondition({
-    required this.condition,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      condition,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.normal,
-      ),
-    );
-  }
-}
-
-class DayHeader extends StatelessWidget {
-  final String day;
-  const DayHeader({
-    required this.day,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Text(
-        day,
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-}
-
-class Temparature extends StatefulWidget {
-  final int temparature;
-  const Temparature({
-    required this.temparature,
-    super.key,
-  });
-
-  @override
-  State<Temparature> createState() => _TemparatureState();
-}
-
-class _TemparatureState extends State<Temparature> {
-  late bool _isToggled = false;
-  late int temparature = widget.temparature;
-  late String temparatureType = "C";
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Center(
-            child: Text(
-              "$temparature°$temparatureType",
-              style: const TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-              ),
+    return Scaffold(
+      body: BlocBuilder<WeatherCubit, WeatherState>(
+        builder: (context, state) {
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 18.0, vertical: 48.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter text',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                        width:
+                            10), // Add some space between the TextField and the Button
+                    // Button
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<WeatherCubit>()
+                            .fetchWeather(controller.text);
+                      },
+                      child: const Text('Submit'),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SizedBox(
+                    child: RefreshIndicator(
+                      onRefresh: refreshData,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            if (state.status == WeatherStatus.init) ...[
+                              const SizedBox.shrink(),
+                            ],
+                            if (state.status == WeatherStatus.loading) ...[
+                              const VerticalSpace(spaceLength: 24),
+                              const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ],
+                            if (state.status == WeatherStatus.loaded) ...[
+                              const VerticalSpace(spaceLength: 48.0),
+                              DayHeader(
+                                day: state.weekDay,
+                              ),
+                              const VerticalSpace(spaceLength: 24),
+                              WeatherCondition(
+                                condition: state.weather,
+                              ),
+                              const VerticalSpace(spaceLength: 24),
+                              // weatherIcon(screenWidth, ),
+                              WeatherIcon(
+                                iconId: state.weatherIcon, //"03d",
+                              ),
+                              Temparature(
+                                temparature: state.temparature,
+                              ),
+                              const VerticalSpace(spaceLength: 24.0),
+                              OtherMeasures(
+                                measurementName: "Humidity",
+                                amount: state.humidity,
+                                symbol: "%",
+                              ),
+                              const Divider(),
+                              OtherMeasures(
+                                measurementName: "Pressure",
+                                amount: state.pressure,
+                                symbol: "hPa",
+                              ),
+                              const Divider(),
+                              OtherMeasures(
+                                measurementName: "Wind",
+                                amount: state.wind.toInt(),
+                                symbol: "km/h",
+                              ),
+                              const VerticalSpace(spaceLength: 24.0),
+                              WeatherForcast(
+                                forecastList: state.forcastList,
+                              ),
+                            ],
+                            if (state.status == WeatherStatus.refreshing) ...[
+                              const VerticalSpace(spaceLength: 24.0),
+                              const CircularProgressIndicator(),
+                            ],
+                            if (state.status == WeatherStatus.error) ...[
+                              Center(
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      context
+                                          .read<WeatherCubit>()
+                                          .fetchWeather('Berlin');
+                                      controller.text = 'Berlin';
+                                    },
+                                    child: const Text('Press to restart')),
+                              )
+                            ]
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Row(
-            children: [
-              const Text("C"),
-              Switch(
-                value: _isToggled,
-                onChanged: (value) {
-                  setState(() {
-                    _isToggled = value;
-                    if (_isToggled) {
-                      print("Change to FT");
-                      double temp = temparature / -17.22222;
-                      temparature = temp.toInt();
-                      temparatureType = "F";
-                    } else {
-                      print("Change to C");
-                      temparature = widget.temparature;
-                      temparatureType = "C";
-                    }
-                  });
-                },
-              ),
-              const Text("F"),
-            ],
-          ),
-        ),
-      ],
+          );
+        },
+      ),
     );
   }
 }
