@@ -18,6 +18,9 @@ dependencies:
   weather_icons:
 
 dev_dependencies:
+  bloc_test:
+  mocktail:
+  mockito:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0

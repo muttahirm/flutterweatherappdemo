@@ -21,11 +21,6 @@ class WeatherCubit extends Cubit<WeatherState> {
     fetchWeather(cityName);
   }
 
-  void fetchNewCity(String city) {
-    emit(state.withStatus(WeatherStatus.loading));
-    fetchWeather(city);
-  }
-
   void fetchWeather(String city) async {
     cityName = city;
     FetchWeatherRequest request = FetchWeatherRequest(city: city);
