@@ -17,8 +17,8 @@ class _TemparatureState extends State<Temparature> {
 
   double get convertedTemperature {
     if (_isToggled) {
-      return widget.temparature * 9 / 5 +
-          32; // Celsius to Fahrenheit conversion
+      // Celsius to Fahrenheit conversion
+      return widget.temparature * 9 / 5 + 32;
     } else {
       return widget.temparature;
     }

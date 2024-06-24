@@ -31,14 +31,11 @@ class WeatherScreen extends StatelessWidget {
                       child: TextField(
                         controller: controller,
                         decoration: const InputDecoration(
-                          hintText: 'Enter text',
+                          hintText: 'Enter City',
                         ),
                       ),
                     ),
-                    const SizedBox(
-                        width:
-                            10), // Add some space between the TextField and the Button
-                    // Button
+                    const HorizotalSpace(spaceLength: 10),
                     ElevatedButton(
                       onPressed: () {
                         context
@@ -78,9 +75,8 @@ class WeatherScreen extends StatelessWidget {
                                 condition: state.weather,
                               ),
                               const VerticalSpace(spaceLength: 24),
-                              // weatherIcon(screenWidth, ),
                               WeatherIcon(
-                                iconId: state.weatherIcon, //"03d",
+                                iconId: state.weatherIcon,
                               ),
                               Temparature(
                                 temparature: state.temparature,
